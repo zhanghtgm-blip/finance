@@ -57,7 +57,7 @@
 
 2. 基于各国报告生成一篇汇总以色列和欧洲各国的财经综合洞察报告,报告名称index.html，在index.html中增加各国报告的链接
 
-3. 报告目录：D:\ERI-Finance\财经日报\reports\\{日期}
+3. 报告目录：D:\ERI-Finance\财经日报\reports\{YYYY.MM.DD}
 
 4. 信息要求都有真实来源，不做任何加工
 
@@ -72,15 +72,16 @@
    - 初始化Git仓库：在 D:\ERI-Finance\财经日报 目录执行 git init
    - 配置用户凭据：git config user.email "zhanght.gm@gmail.com" && git config user.name "ERI Finance"
    - 添加远程仓库：git remote add origin https://github.com/zhanghtgm-blip/finance.git
-   - 复制报告到report目录：cp reports/2026-05-14/*.html reports/2026.05.14/
-   - 添加并提交：git add report/2026.05.14/*.html && git commit -m "Add ERI财经日报 reports YYYY.MM.DD"
+   - 复制报告到reports目录：cp reports/2026-05-14/*.html reports/2026.05.14/
+   - 添加并提交：git add reports/2026.05.14/*.html && git commit -m "Add ERI财经日报 reports YYYY.MM.DD"
    - 推送到GitHub：git push origin master
    
-   **报告存放路径**: report/{YYYY.MM.DD}
+   **报告存放路径**: reports/{YYYY.MM.DD}
    
-   - wwwwwwwwwwwwfdfadfad例如：report/2026.05.14、report/2026.05.13
+   - 例如：reports/2026.05.14、reports/2026.05.13
    
    **GitHub访问地址**:
    
-   - 2026.05.14: https://github.com/zhanghtgm-blip/finance/tree/master/report/2026.05.14
-   - 2026.05.13: https://github.com/zhanghtgm-blip/finance/tree/master/report/2026.05.13
+   - 2026.05.15: https://github.com/zhanghtgm-blip/finance/tree/master/reports/2026.05.15
+   - 2026.05.14: https://github.com/zhanghtgm-blip/finance/tree/master/reports/2026.05.14
+   - 2026.05.13: https://github.com/zhanghtgm-blip/finance/tree/master/reports/2026.05.13
