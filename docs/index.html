@@ -146,9 +146,10 @@
             background: #fff;
             border-radius: 12px;
             padding: 20px;
-            overflow: hidden;
+            overflow: auto;
             display: flex;
             flex-direction: column;
+            min-width: 0;
         }
         
         .content-header {
@@ -181,11 +182,11 @@
             color: #333;
             line-height: 1.8;
             font-size: 14px;
-            overflow-x: auto;
-            overflow-y: auto;
-            white-space: pre-wrap !important;
-            word-wrap: break-word !important;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
             display: block;
+            min-width: 0;
         }
 
         .content-body * {
