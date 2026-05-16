@@ -183,14 +183,25 @@
             font-size: 14px;
             overflow-x: auto;
             overflow-y: auto;
-            white-space: normal !important;
+            white-space: pre-wrap !important;
             word-wrap: break-word !important;
+            display: block;
         }
 
         .content-body * {
-            white-space: normal !important;
+            white-space: pre-wrap !important;
             word-wrap: break-word !important;
             max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .content-body pre {
+            white-space: pre-wrap !important;
+            word-wrap: break-word !important;
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
         }
         
         .content-body h1, .content-body h2, .content-body h3 {
