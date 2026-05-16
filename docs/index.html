@@ -149,7 +149,8 @@
             overflow: auto;
             display: flex;
             flex-direction: column;
-            min-width: 0;
+            width: 100%;
+            max-width: 100%;
         }
         
         .content-header {
@@ -183,17 +184,15 @@
             line-height: 1.8;
             font-size: 14px;
             overflow: auto;
-            white-space: pre-wrap;
             word-wrap: break-word;
             display: block;
-            min-width: 0;
+            width: 100%;
+            max-width: 100%;
         }
 
-        .content-body * {
-            white-space: pre-wrap !important;
-            word-wrap: break-word !important;
-            max-width: 100%;
-            box-sizing: border-box;
+        .content-body table {
+            display: block;
+            overflow: auto;
         }
 
         .content-body pre {
