@@ -472,12 +472,9 @@
                 const data = await response.json();
 
                 // 正确解码 UTF-8 Base64 内容
-                const binaryString = atob(data.content);
-                const bytes = new Uint8Array(binaryString.length);
-                for (let i = 0; i < binaryString.length; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
-                }
-                const content = new TextDecoder('utf-8').decode(bytes);
+                const content = decodeURIComponent(atob(data.content).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
                 
                 // 提取 body 内容
                 let bodyContent = content;
