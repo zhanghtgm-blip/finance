@@ -148,6 +148,19 @@
             color: #333;
         }
         
+        .content-link {
+            padding: 6px 12px;
+            background: #00d4ff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+        
+        .content-link:hover {
+            background: #00aadd;
+        }
+        
         .close-content {
             padding: 6px 12px;
             background: #f5f5f5;
@@ -156,10 +169,15 @@
             color: #666;
             cursor: pointer;
             font-size: 12px;
+            margin-left: 10px;
         }
         
         .close-content:hover {
             background: #eee;
+        }
+        
+        .content-header-buttons {
+            display: flex;
         }
         
         .content-body {
@@ -167,6 +185,8 @@
             line-height: 1.8;
             font-size: 14px;
             overflow-x: auto;
+            max-height: 700px;
+            overflow-y: auto;
         }
         
         .content-body h1, .content-body h2, .content-body h3 {
@@ -196,15 +216,6 @@
             font-weight: 600;
         }
         
-        .content-body a {
-            color: #00d4ff;
-            text-decoration: none;
-        }
-        
-        .content-body a:hover {
-            text-decoration: underline;
-        }
-        
         .loading {
             text-align: center;
             padding: 50px;
@@ -215,6 +226,14 @@
             text-align: center;
             padding: 50px;
             color: #ff6b6b;
+        }
+        
+        .error-dark {
+            text-align: center;
+            padding: 30px;
+            color: #ff6b6b;
+            background: #fff;
+            border-radius: 8px;
         }
         
         .refresh-btn {
@@ -255,7 +274,10 @@
         <div class="content-container hidden" id="contentContainer">
             <div class="content-header">
                 <span class="content-title" id="contentTitle">文件内容</span>
-                <button class="close-content" onclick="closeContent()">✕ 关闭</button>
+                <div class="content-header-buttons">
+                    <a class="content-link" id="contentLink" href="#" target="_blank" rel="noopener">在GitHub查看</a>
+                    <button class="close-content" onclick="closeContent()">✕ 关闭</button>
+                </div>
             </div>
             <div class="content-body" id="contentBody">
                 <div class="loading" style="color: #999;">加载内容...</div>
@@ -268,11 +290,9 @@
         const REPO = 'finance';
         const BASE_PATH = 'report';
         
-        // 使用 GitHub API 代理CORS
-        const PROXY_URL = 'https://api.allorigins.win/raw?url=';
-        
         let cachedDates = null;
         let cachedFiles = {};
+        let fileContents = {};
         let currentDate = '';
         let currentFile = null;
         
@@ -355,8 +375,6 @@
             });
             
             document.getElementById('fileSectionTitle').textContent = `📄 ${dateName} 目录文件`;
-            
-            // 关闭内容显示
             closeContent();
             
             await loadFiles(dateName);
@@ -426,39 +444,53 @@
             const container = document.getElementById('contentContainer');
             const contentBody = document.getElementById('contentBody');
             const contentTitle = document.getElementById('contentTitle');
+            const contentLink = document.getElementById('contentLink');
             
             contentTitle.textContent = file.name;
+            contentLink.href = file.html_url;
             contentBody.innerHTML = '<div class="loading" style="color: #999;">加载内容...</div>';
             container.classList.remove('hidden');
             
+            const cacheKey = `${currentDate}/${file.name}`;
+            
+            // 检查缓存
+            if (fileContents[cacheKey]) {
+                contentBody.innerHTML = fileContents[cacheKey];
+                container.scrollIntoView({ behavior: 'smooth' });
+                return;
+            }
+            
             try {
-                // 通过 AllOrigins 代理获取原始内容，避开 CORS
-                const rawUrl = `https://raw.githubusercontent.com/${OWNER}/${REPO}/master/${BASE_PATH}/${currentDate}/${file.name}`;
-                const proxyUrl = PROXY_URL + encodeURIComponent(rawUrl);
-                
-                const response = await fetch(proxyUrl);
+                // 使用 GitHub API 获取文件内容
+                const apiUrl = file.url;
+                const response = await fetch(apiUrl);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
                 }
                 
-                let content = await response.text();
+                const data = await response.json();
                 
-                // 清理 HTML 内容，移除 body 标签，保留内部内容
+                // 解码 base64 内容
+                const content = decodeURIComponent(encodeURIComponent(atob(data.content)));
+                
+                // 提取 body 内容
+                let bodyContent = content;
                 const bodyMatch = content.match(/<body[^>]*>([\s\S]*)<\/body>/i);
                 if (bodyMatch) {
-                    content = bodyMatch[1];
+                    bodyContent = bodyMatch[1];
                 }
                 
-                // 清理可能的相对路径
-                content = content.replace(/src="/g, 'src="https://raw.githubusercontent.com/zhanghtgm-blip/finance/master/');
-                content = content.replace(/href="/g, 'href="https://github.com/zhanghtgm-blip/finance/blob/master/');
+                // 清理相对路径
+                bodyContent = bodyContent.replace(/src="/g, 'src="https://raw.githubusercontent.com/zhanghtgm-blip/finance/master/');
+                bodyContent = bodyContent.replace(/href="/g, 'href="https://github.com/zhanghtgm-blip/finance/blob/master/');
                 
-                contentBody.innerHTML = content;
+                fileContents[cacheKey] = bodyContent;
+                contentBody.innerHTML = bodyContent;
                 
                 container.scrollIntoView({ behavior: 'smooth' });
             } catch (error) {
-                contentBody.innerHTML = `<div class="error">加载失败: ${error.message}</div>`;
+                contentBody.innerHTML = `<div class="error-dark">加载失败: ${error.message}</div>`;
             }
         }
         
