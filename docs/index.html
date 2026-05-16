@@ -20,7 +20,7 @@
         
         .header {
             background: rgba(0, 0, 0, 0.3);
-            padding: 20px 40px;
+            padding: 15px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -28,7 +28,7 @@
         }
         
         .header h1 {
-            font-size: 24px;
+            font-size: 20px;
             background: linear-gradient(90deg, #00d4ff, #7b2cbf);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -41,39 +41,41 @@
         }
         
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            height: calc(100vh - 70px);
         }
         
-        .section-title {
-            font-size: 18px;
-            margin-bottom: 20px;
-            color: rgba(255, 255, 255, 0.7);
+        /* 左侧栏 - 日期选择 + 文件列表 */
+        .left-panel {
+            width: 280px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
         
         .date-list {
             display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
+            gap: 10px;
             flex-wrap: wrap;
         }
         
         .date-btn {
-            padding: 15px 30px;
+            padding: 10px 20px;
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
+            border-radius: 6px;
             color: #fff;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
         }
         
         .date-btn:hover {
             background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
         }
         
         .date-btn.active {
@@ -81,20 +83,28 @@
             border-color: transparent;
         }
         
+        .section-title {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 10px;
+        }
+        
         .file-list {
+            flex: 1;
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-bottom: 30px;
+            gap: 8px;
+            padding-right: 5px;
         }
         
         .file-item {
             display: flex;
             align-items: center;
-            padding: 15px 20px;
+            padding: 12px 15px;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.3s ease;
             text-decoration: none;
@@ -103,49 +113,58 @@
         
         .file-item:hover {
             background: rgba(255, 255, 255, 0.1);
-            transform: translateX(5px);
+            transform: translateX(3px);
             border-color: rgba(0, 212, 255, 0.5);
         }
         
-        .file-item:hover .icon {
-            transform: scale(1.2);
+        .file-item.active {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: #00d4ff;
         }
         
         .file-item .icon {
-            font-size: 24px;
-            margin-right: 15px;
-            transition: transform 0.3s ease;
+            font-size: 18px;
+            margin-right: 10px;
         }
         
         .file-item .name {
             flex: 1;
-            font-size: 15px;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .file-item .size {
-            font-size: 12px;
+            font-size: 11px;
             color: rgba(255, 255, 255, 0.5);
         }
         
-        .content-container {
+        /* 右侧栏 - 内容显示 */
+        .right-panel {
+            flex: 1;
             background: #fff;
             border-radius: 12px;
             padding: 20px;
-            min-height: 500px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
         
         .content-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
             border-bottom: 1px solid #eee;
+            flex-shrink: 0;
         }
         
         .content-title {
             font-size: 16px;
             color: #333;
+            font-weight: bold;
         }
         
         .content-link {
@@ -157,41 +176,18 @@
             font-size: 12px;
         }
         
-        .content-link:hover {
-            background: #00aadd;
-        }
-        
-        .close-content {
-            padding: 6px 12px;
-            background: #f5f5f5;
-            border: none;
-            border-radius: 6px;
-            color: #666;
-            cursor: pointer;
-            font-size: 12px;
-            margin-left: 10px;
-        }
-        
-        .close-content:hover {
-            background: #eee;
-        }
-        
-        .content-header-buttons {
-            display: flex;
-        }
-        
         .content-body {
+            flex: 1;
             color: #333;
             line-height: 1.8;
             font-size: 14px;
             overflow-x: auto;
-            max-height: 700px;
             overflow-y: auto;
         }
         
         .content-body h1, .content-body h2, .content-body h3 {
             color: #1a1a2e;
-            margin: 20px 0 10px 0;
+            margin: 15px 0 10px 0;
         }
         
         .content-body p {
@@ -222,6 +218,12 @@
             color: rgba(255, 255, 255, 0.5);
         }
         
+        .loading-dark {
+            text-align: center;
+            padding: 50px;
+            color: #999;
+        }
+        
         .error {
             text-align: center;
             padding: 50px;
@@ -244,10 +246,22 @@
             color: #00d4ff;
             cursor: pointer;
             font-size: 12px;
+            margin-left: 15px;
         }
         
-        .hidden {
-            display: none !important;
+        /* 滚动条样式 */
+        .file-list::-webkit-scrollbar, .content-body::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .file-list::-webkit-scrollbar-track, .content-body::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        
+        .file-list::-webkit-scrollbar-thumb, .content-body::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
         }
     </style>
 </head>
@@ -256,31 +270,36 @@
         <h1>📊 Finance Report 动态镜像站</h1>
         <div>
             <span class="last-update" id="lastUpdate">最后更新: --</span>
-            <button class="refresh-btn" onclick="location.reload()" style="margin-left: 15px;">🔄 刷新</button>
+            <button class="refresh-btn" onclick="location.reload()">🔄 刷新</button>
         </div>
     </div>
     
     <div class="container">
-        <h2 class="section-title">📁 选择日期目录</h2>
-        <div class="date-list" id="dateList">
-            <div class="loading">加载日期目录...</div>
-        </div>
-        
-        <h2 class="section-title" id="fileSectionTitle">📄 当前目录文件</h2>
-        <div class="file-list" id="fileList">
-            <div class="loading">请先选择日期目录</div>
-        </div>
-        
-        <div class="content-container hidden" id="contentContainer">
-            <div class="content-header">
-                <span class="content-title" id="contentTitle">文件内容</span>
-                <div class="content-header-buttons">
-                    <a class="content-link" id="contentLink" href="#" target="_blank" rel="noopener">在GitHub查看</a>
-                    <button class="close-content" onclick="closeContent()">✕ 关闭</button>
+        <!-- 左侧面板 -->
+        <div class="left-panel">
+            <div>
+                <div class="section-title">📁 选择日期</div>
+                <div class="date-list" id="dateList">
+                    <div class="loading" style="padding: 10px;">加载中...</div>
                 </div>
             </div>
+            
+            <div style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+                <div class="section-title" id="fileSectionTitle">📄 文件列表</div>
+                <div class="file-list" id="fileList">
+                    <div class="loading" style="padding: 10px;">请先选择日期</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 右侧面板 -->
+        <div class="right-panel">
+            <div class="content-header">
+                <span class="content-title" id="contentTitle">文件内容</span>
+                <a class="content-link" id="contentLink" href="#" target="_blank" rel="noopener">在GitHub查看</a>
+            </div>
             <div class="content-body" id="contentBody">
-                <div class="loading" style="color: #999;">加载内容...</div>
+                <div class="loading-dark">请选择文件查看内容</div>
             </div>
         </div>
     </div>
@@ -319,7 +338,7 @@
         
         async function loadDates() {
             const dateList = document.getElementById('dateList');
-            dateList.innerHTML = '<div class="loading">加载日期目录...</div>';
+            dateList.innerHTML = '<div class="loading" style="padding: 10px;">加载中...</div>';
             
             if (cachedDates) {
                 renderDates(cachedDates);
@@ -348,7 +367,7 @@
             dateList.innerHTML = '';
             
             if (!Array.isArray(dates) || dates.length === 0) {
-                dateList.innerHTML = '<div class="loading">暂无日期目录</div>';
+                dateList.innerHTML = '<div class="loading" style="padding: 10px;">暂无日期</div>';
                 return;
             }
             
@@ -374,15 +393,14 @@
                 btn.classList.toggle('active', btn.textContent === dateName);
             });
             
-            document.getElementById('fileSectionTitle').textContent = `📄 ${dateName} 目录文件`;
-            closeContent();
+            document.getElementById('fileSectionTitle').textContent = `📄 ${dateName} 文件`;
             
             await loadFiles(dateName);
         }
         
         async function loadFiles(dateName) {
             const fileList = document.getElementById('fileList');
-            fileList.innerHTML = '<div class="loading">加载文件列表...</div>';
+            fileList.innerHTML = '<div class="loading" style="padding: 10px;">加载文件...</div>';
             
             const cacheKey = `${dateName}`;
             if (cachedFiles[cacheKey]) {
@@ -411,7 +429,7 @@
             fileList.innerHTML = '';
             
             if (!Array.isArray(files) || files.length === 0) {
-                fileList.innerHTML = '<div class="loading">暂无文件</div>';
+                fileList.innerHTML = '<div class="loading" style="padding: 10px;">暂无文件</div>';
                 return;
             }
             
@@ -432,36 +450,47 @@
                 item.innerHTML = `
                     <span class="icon">${icon}</span>
                     <span class="name">${file.name}</span>
-                    <span class="size">${(file.size / 1024).toFixed(1)} KB</span>
+                    <span class="size">${(file.size / 1024).toFixed(1)}KB</span>
                 `;
                 item.onclick = () => openFile(file);
                 fileList.appendChild(item);
             });
+            
+            // 默认显示 index.html
+            const indexFile = sortedFiles.find(f => f.name === 'index.html');
+            if (indexFile) {
+                openFile(indexFile);
+            }
         }
         
         async function openFile(file) {
             currentFile = file;
-            const container = document.getElementById('contentContainer');
+            
+            // 更新选中状态
+            document.querySelectorAll('.file-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.querySelector('.name').textContent === file.name) {
+                    item.classList.add('active');
+                }
+            });
+            
             const contentBody = document.getElementById('contentBody');
             const contentTitle = document.getElementById('contentTitle');
             const contentLink = document.getElementById('contentLink');
             
             contentTitle.textContent = file.name;
             contentLink.href = file.html_url;
-            contentBody.innerHTML = '<div class="loading" style="color: #999;">加载内容...</div>';
-            container.classList.remove('hidden');
+            contentBody.innerHTML = '<div class="loading-dark">加载内容...</div>';
             
             const cacheKey = `${currentDate}/${file.name}`;
             
             // 检查缓存
             if (fileContents[cacheKey]) {
                 contentBody.innerHTML = fileContents[cacheKey];
-                container.scrollIntoView({ behavior: 'smooth' });
                 return;
             }
             
             try {
-                // 使用 GitHub API 获取文件内容
                 const apiUrl = file.url;
                 const response = await fetch(apiUrl);
                 
@@ -470,8 +499,8 @@
                 }
                 
                 const data = await response.json();
-
-                // 正确解码 UTF-8 Base64 内容
+                
+                // 解码 UTF-8 Base64
                 const content = decodeURIComponent(atob(data.content).split('').map(function(c) {
                     return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
                 }).join(''));
@@ -489,20 +518,9 @@
                 
                 fileContents[cacheKey] = bodyContent;
                 contentBody.innerHTML = bodyContent;
-                
-                container.scrollIntoView({ behavior: 'smooth' });
             } catch (error) {
                 contentBody.innerHTML = `<div class="error-dark">加载失败: ${error.message}</div>`;
             }
-        }
-        
-        function closeContent() {
-            const container = document.getElementById('contentContainer');
-            const contentBody = document.getElementById('contentBody');
-            
-            contentBody.innerHTML = '';
-            container.classList.add('hidden');
-            currentFile = null;
         }
         
         function updateLastUpdate() {
