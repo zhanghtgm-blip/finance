@@ -81,18 +81,11 @@
             border-color: transparent;
         }
         
-        .file-section {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 20px;
-        }
-        
         .file-list {
             display: flex;
             flex-direction: column;
             gap: 12px;
+            margin-bottom: 30px;
         }
         
         .file-item {
@@ -129,6 +122,46 @@
             color: rgba(255, 255, 255, 0.5);
         }
         
+        .iframe-container {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 600px;
+        }
+        
+        .iframe-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .iframe-title {
+            font-size: 16px;
+            color: #00d4ff;
+        }
+        
+        .close-iframe {
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+            border-radius: 8px;
+            background: #fff;
+        }
+        
         .loading {
             text-align: center;
             padding: 50px;
@@ -141,17 +174,6 @@
             color: #ff6b6b;
         }
         
-        .back-btn {
-            display: inline-block;
-            padding: 8px 16px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
-            color: #fff;
-            text-decoration: none;
-            margin-bottom: 20px;
-            cursor: pointer;
-        }
-        
         .refresh-btn {
             padding: 8px 16px;
             background: rgba(0, 212, 255, 0.2);
@@ -160,69 +182,6 @@
             color: #00d4ff;
             cursor: pointer;
             font-size: 12px;
-        }
-        
-        .viewer {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 30px;
-            min-height: 500px;
-        }
-        
-        .viewer-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .viewer-title {
-            font-size: 20px;
-            color: #00d4ff;
-        }
-        
-        .close-btn {
-            padding: 8px 16px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 6px;
-            color: #fff;
-            cursor: pointer;
-        }
-        
-        .viewer-content {
-            line-height: 1.8;
-            color: rgba(255, 255, 255, 0.8);
-            max-height: 70vh;
-            overflow-y: auto;
-        }
-        
-        .viewer-content h1, .viewer-content h2, .viewer-content h3 {
-            color: #fff;
-            margin: 20px 0 10px 0;
-        }
-        
-        .viewer-content p {
-            margin: 10px 0;
-        }
-        
-        .viewer-content table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        
-        .viewer-content th, .viewer-content td {
-            padding: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            text-align: left;
-        }
-        
-        .viewer-content th {
-            background: rgba(255, 255, 255, 0.1);
         }
         
         .hidden {
@@ -239,30 +198,23 @@
         </div>
     </div>
     
-    <div class="container" id="mainContainer">
+    <div class="container">
         <h2 class="section-title">📁 选择日期目录</h2>
         <div class="date-list" id="dateList">
             <div class="loading">加载日期目录...</div>
         </div>
         
-        <div id="fileSection" class="file-section hidden">
-            <h2 class="section-title" id="fileSectionTitle">📄 当前目录文件</h2>
-            <div class="file-list" id="fileList">
-                <div class="loading">加载文件列表...</div>
-            </div>
+        <h2 class="section-title" id="fileSectionTitle">📄 当前目录文件</h2>
+        <div class="file-list" id="fileList">
+            <div class="loading">请先选择日期目录</div>
         </div>
-    </div>
-    
-    <div class="container hidden" id="viewerContainer">
-        <a class="back-btn" onclick="closeViewer()">← 返回列表</a>
-        <div class="viewer">
-            <div class="viewer-header">
-                <span class="viewer-title" id="viewerTitle">文件内容</span>
-                <button class="close-btn" onclick="closeViewer()">✕ 关闭</button>
+        
+        <div class="iframe-container hidden" id="iframeContainer">
+            <div class="iframe-header">
+                <span class="iframe-title" id="iframeTitle">文件内容</span>
+                <button class="close-iframe" onclick="closeIframe()">✕ 关闭</button>
             </div>
-            <div class="viewer-content" id="viewerContent">
-                <div class="loading">加载文件内容...</div>
-            </div>
+            <iframe id="contentFrame" src=""></iframe>
         </div>
     </div>
     
@@ -275,7 +227,6 @@
         let cachedFiles = {};
         let currentDate = '';
         
-        // 国家/地区图标映射
         const countryIcons = {
             'Europe': '🌍',
             'Belgium': '🇧🇪',
@@ -291,14 +242,12 @@
             'index': '📋'
         };
         
-        // 初始化
         document.addEventListener('DOMContentLoaded', init);
         
         async function init() {
             await loadDates();
         }
         
-        // 加载日期目录列表
         async function loadDates() {
             const dateList = document.getElementById('dateList');
             dateList.innerHTML = '<div class="loading">加载日期目录...</div>';
@@ -325,7 +274,6 @@
             }
         }
         
-        // 渲染日期列表
         function renderDates(dates) {
             const dateList = document.getElementById('dateList');
             dateList.innerHTML = '';
@@ -335,7 +283,6 @@
                 return;
             }
             
-            // 按日期排序（倒序）
             const sortedDates = dates.filter(d => d.type === 'dir').sort((a, b) => b.name.localeCompare(a.name));
             
             sortedDates.forEach(dateDir => {
@@ -346,29 +293,23 @@
                 dateList.appendChild(btn);
             });
             
-            // 自动选择第一个日期
             if (sortedDates.length > 0 && !currentDate) {
                 selectDate(sortedDates[0].name);
             }
         }
         
-        // 选择日期
         async function selectDate(dateName) {
             currentDate = dateName;
             
-            // 更新按钮状态
             document.querySelectorAll('.date-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.textContent === dateName);
             });
             
-            // 显示文件区域
-            document.getElementById('fileSection').classList.remove('hidden');
-            document.getElementById('fileSectionTitle').textContent = `�� ${dateName} 目录文件`;
+            document.getElementById('fileSectionTitle').textContent = `📄 ${dateName} 目录文件`;
             
             await loadFiles(dateName);
         }
         
-        // 加载文件列表
         async function loadFiles(dateName) {
             const fileList = document.getElementById('fileList');
             fileList.innerHTML = '<div class="loading">加载文件列表...</div>';
@@ -395,7 +336,6 @@
             }
         }
         
-        // 渲染文件列表
         function renderFiles(files) {
             const fileList = document.getElementById('fileList');
             fileList.innerHTML = '';
@@ -405,7 +345,6 @@
                 return;
             }
             
-            // 文件排序：index.html 优先，其余按名称排序
             const sortedFiles = files.filter(f => f.type === 'file' && f.name.endsWith('.html'))
                 .sort((a, b) => {
                     if (a.name === 'index.html') return -1;
@@ -414,7 +353,7 @@
                 });
             
             sortedFiles.forEach(file => {
-                const item = document.createElement('a');
+                const item = document.createElement('div');
                 item.className = 'file-item';
                 
                 const nameWithoutExt = file.name.replace('.html', '');
@@ -425,58 +364,35 @@
                     <span class="name">${file.name}</span>
                     <span class="size">${(file.size / 1024).toFixed(1)} KB</span>
                 `;
-                item.onclick = (e) => {
-                    e.preventDefault();
-                    openFile(file);
-                };
+                item.onclick = () => openFile(file);
                 fileList.appendChild(item);
             });
         }
         
-        // 打开文件
-        async function openFile(file) {
-            const viewerContainer = document.getElementById('viewerContainer');
-            const viewerContent = document.getElementById('viewerContent');
-            const viewerTitle = document.getElementById('viewerTitle');
+        function openFile(file) {
+            const iframeContainer = document.getElementById('iframeContainer');
+            const contentFrame = document.getElementById('contentFrame');
+            const iframeTitle = document.getElementById('iframeTitle');
             
-            viewerContainer.classList.remove('hidden');
-            viewerContent.innerHTML = '<div class="loading">加载文件内容...</div>';
-            viewerTitle.textContent = file.name;
+            // 使用 raw.githubusercontent.com 直接加载 HTML 文件
+            const rawUrl = `https://raw.githubusercontent.com/${OWNER}/${REPO}/master/${BASE_PATH}/${currentDate}/${file.name}`;
             
-            // 隐藏主容器
-            document.getElementById('mainContainer').classList.add('hidden');
+            contentFrame.src = rawUrl;
+            iframeTitle.textContent = file.name;
+            iframeContainer.classList.remove('hidden');
             
-            try {
-                const response = await fetch(file.download_url);
-                const htmlContent = await response.text();
-                
-                // 提取body内容
-                const bodyMatch = htmlContent.match(/<body[^>]*>([\s\S]*)<\/body>/i);
-                let content = bodyMatch ? bodyMatch[1] : htmlContent;
-                
-                // 清理内容中的相对路径
-                content = content.replace(/src="/g, 'src="https://raw.githubusercontent.com/zhanghtgm-blip/finance/master/');
-                content = content.replace(/href="/g, 'href="https://github.com/zhanghtgm-blip/finance/blob/master/');
-                
-                viewerContent.innerHTML = content;
-                
-                // 滚动到顶部
-                viewerContainer.scrollIntoView({ behavior: 'smooth' });
-            } catch (error) {
-                viewerContent.innerHTML = `<div class="error">加载失败: ${error.message}</div>`;
-            }
+            // 滚动到 iframe 区域
+            iframeContainer.scrollIntoView({ behavior: 'smooth' });
         }
         
-        // 关闭查看器
-        function closeViewer() {
-            const viewerContainer = document.getElementById('viewerContainer');
-            viewerContainer.classList.add('hidden');
+        function closeIframe() {
+            const iframeContainer = document.getElementById('iframeContainer');
+            const contentFrame = document.getElementById('contentFrame');
             
-            // 显示主容器
-            document.getElementById('mainContainer').classList.remove('hidden');
+            contentFrame.src = '';
+            iframeContainer.classList.add('hidden');
         }
         
-        // 更新最后更新时间
         function updateLastUpdate() {
             const now = new Date();
             const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
