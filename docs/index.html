@@ -330,7 +330,52 @@
         const REPO = 'finance';
         const BASE_PATH = 'report';
         
-        let cachedDates = null;
+        // 预定义的日期列表（嵌入避免API调用）
+        const DATE_LIST = ['2026.05.15', '2026.05.14', '2026.05.13'];
+        
+        // 预定义的文件列表（按日期）
+        const FILE_LIST = {
+            '2026.05.15': [
+                { name: 'index.html', size: 134 },
+                { name: 'Belgium-2026-05-15.html', size: 98 },
+                { name: 'Europe-2026-05-15.html', size: 134 },
+                { name: 'Finland-2026-05-15.html', size: 98 },
+                { name: 'France-2026-05-15.html', size: 136 },
+                { name: 'Germany-2026-05-15.html', size: 136 },
+                { name: 'Ireland-2026-05-15.html', size: 99 },
+                { name: 'Israel-2026-05-15.html', size: 136 },
+                { name: 'Italy-2026-05-15.html', size: 98 },
+                { name: 'Poland-2026-05-15.html', size: 98 },
+                { name: 'Sweden-2026-05-15.html', size: 98 },
+                { name: 'Switzerland-2026-05-15.html', size: 98 }
+            ],
+            '2026.05.14': [
+                { name: 'Belgium-2026-05-14.html', size: 126 },
+                { name: 'Europe-2026-05-14.html', size: 316 },
+                { name: 'Finland-2026-05-14.html', size: 121 },
+                { name: 'France-2026-05-14.html', size: 122 },
+                { name: 'Germany-2026-05-14.html', size: 123 },
+                { name: 'Ireland-2026-05-14.html', size: 120 },
+                { name: 'Israel-2026-05-14.html', size: 136 },
+                { name: 'Italy-2026-05-14.html', size: 116 },
+                { name: 'Poland-2026-05-14.html', size: 115 },
+                { name: 'Sweden-2026-05-14.html', size: 125 },
+                { name: 'Switzerland-2026-05-14.html', size: 123 }
+            ],
+            '2026.05.13': [
+                { name: 'Belgium-2026-05-13.html', size: 81 },
+                { name: 'Europe-2026-05-13.html', size: 122 },
+                { name: 'Finland-2026-05-13.html', size: 85 },
+                { name: 'France-2026-05-13.html', size: 95 },
+                { name: 'Germany-2026-05-13.html', size: 97 },
+                { name: 'Ireland-2026-05-13.html', size: 94 },
+                { name: 'Israel-2026-05-13.html', size: 98 },
+                { name: 'Italy-2026-05-13.html', size: 84 },
+                { name: 'Poland-2026-05-13.html', size: 84 },
+                { name: 'Sweden-2026-05-13.html', size: 83 },
+                { name: 'Switzerland-2026-05-13.html', size: 84 }
+            ]
+        };
         let cachedFiles = {};
         let fileContents = {};
         let currentDate = '';
@@ -368,24 +413,8 @@ async function init() {
             dateList.innerHTML = '<div class="loading" style="padding: 10px;">加载中...</div>';
             
             if (cachedDates) {
-                renderDates(cachedDates);
+                renderDates(cachedDates.map(name => ({ name, type: 'dir' })));
                 return;
-            }
-            
-            try {
-                const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${BASE_PATH}`;
-                const response = await fetch(url, { headers: apiHeaders });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                
-                const data = await response.json();
-                cachedDates = data;
-                renderDates(data);
-                updateLastUpdate();
-            } catch (error) {
-                dateList.innerHTML = `<div class="error">加载失败: ${error.message}</div>`;
             }
         }
         
@@ -435,20 +464,14 @@ async function init() {
                 return;
             }
             
-            try {
-                const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${BASE_PATH}/${dateName}`;
-                const response = await fetch(url, { headers: apiHeaders });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                
-                const data = await response.json();
-                cachedFiles[cacheKey] = data;
-                renderFiles(data);
-            } catch (error) {
-                fileList.innerHTML = `<div class="error">加载失败: ${error.message}</div>`;
+            // 使用预定义的文件列表
+            if (FILE_LIST[dateName]) {
+                cachedFiles[cacheKey] = FILE_LIST[dateName].map(f => ({ ...f, type: 'file' }));
+                renderFiles(cachedFiles[cacheKey]);
+                return;
             }
+            
+            fileList.innerHTML = '<div class="loading" style="padding: 10px;">暂无文件</div>';
         }
         
         function renderFiles(files) {
@@ -506,7 +529,7 @@ async function init() {
             const contentLink = document.getElementById('contentLink');
             
             contentTitle.textContent = file.name;
-            contentLink.href = file.html_url;
+            contentLink.href = `https://github.com/zhanghtgm-blip/finance/blob/master/${BASE_PATH}/${currentDate}/${file.name}`;
             contentBody.innerHTML = '<div class="loading-dark">加载内容...</div>';
             
             const cacheKey = `${currentDate}/${file.name}`;
@@ -518,10 +541,8 @@ async function init() {
             }
             
             try {
-                // 使用 raw.githubusercontent.com 获取内容（更好的rate limit）
-                const rawUrl = file.download_url || file.content?.replace('\n', '') ? 
-                    `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BASE_PATH}/${currentDate}/${file.name}` :
-                    file.download_url;
+                // 直接使用 raw.githubusercontent.com 获取内容
+                const rawUrl = `https://raw.githubusercontent.com/${OWNER}/${REPO}/master/${BASE_PATH}/${currentDate}/${file.name}`;
                 
                 const response = await fetch(rawUrl, { 
                     headers: { 
@@ -550,30 +571,11 @@ async function init() {
                 
                 fileContents[cacheKey] = bodyContent;
                 contentBody.innerHTML = bodyContent;
+                updateLastUpdate();
             } catch (error) {
-                // 如果raw失败，尝试使用GitHub API
-                try {
-                    const apiUrl = file.url;
-                    const apiResponse = await fetch(apiUrl, { headers: apiHeaders });
-                    
-                    if (!apiResponse.ok) {
-                        if (apiResponse.status === 403) {
-                            throw new Error('API请求超限，请稍后刷新重试');
-                        }
-                        throw new Error(`HTTP ${apiResponse.status}`);
-                    }
-                    
-                    const data = await apiResponse.json();
-                    
-                    // 解码 UTF-8 Base64 - 使用更兼容的方法
-                    let content;
-                    try {
-                        content = new TextDecoder('utf-8').decode(
-                            Uint8Array.from(atob(data.content), c => c.charCodeAt(0))
-                        );
-                    } catch (e) {
-                        content = decodeURIComponent(escape(atob(data.content)));
-                    }
+                contentBody.innerHTML = `<div class="error-dark">加载失败: ${error.message}</div>`;
+            }
+        }
                     
                     // 提取 body 内容
                     let bodyContent = content;
