@@ -1,1 +1,487 @@
-hello world
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Report 动态镜像站</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+        
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .last-update {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .date-list {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .date-btn {
+            padding: 15px 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .date-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .date-btn.active {
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            border-color: transparent;
+        }
+        
+        .file-section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .file-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #fff;
+        }
+        
+        .file-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+            border-color: rgba(0, 212, 255, 0.5);
+        }
+        
+        .file-item .icon {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+        
+        .file-item .name {
+            flex: 1;
+            font-size: 15px;
+        }
+        
+        .file-item .size {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .error {
+            text-align: center;
+            padding: 50px;
+            color: #ff6b6b;
+        }
+        
+        .back-btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: #fff;
+            text-decoration: none;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        
+        .refresh-btn {
+            padding: 8px 16px;
+            background: rgba(0, 212, 255, 0.2);
+            border: 1px solid rgba(0, 212, 255, 0.5);
+            border-radius: 6px;
+            color: #00d4ff;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .viewer {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 30px;
+            min-height: 500px;
+        }
+        
+        .viewer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .viewer-title {
+            font-size: 20px;
+            color: #00d4ff;
+        }
+        
+        .close-btn {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            cursor: pointer;
+        }
+        
+        .viewer-content {
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.8);
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .viewer-content h1, .viewer-content h2, .viewer-content h3 {
+            color: #fff;
+            margin: 20px 0 10px 0;
+        }
+        
+        .viewer-content p {
+            margin: 10px 0;
+        }
+        
+        .viewer-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .viewer-content th, .viewer-content td {
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: left;
+        }
+        
+        .viewer-content th {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 Finance Report 动态镜像站</h1>
+        <div>
+            <span class="last-update" id="lastUpdate">最后更新: --</span>
+            <button class="refresh-btn" onclick="init()" style="margin-left: 15px;">🔄 刷新</button>
+        </div>
+    </div>
+    
+    <div class="container" id="mainContainer">
+        <h2 class="section-title">📁 选择日期目录</h2>
+        <div class="date-list" id="dateList">
+            <div class="loading">加载日期目录...</div>
+        </div>
+        
+        <div id="fileSection" class="file-section hidden">
+            <h2 class="section-title" id="fileSectionTitle">📄 当前目录文件</h2>
+            <div class="file-list" id="fileList">
+                <div class="loading">加载文件列表...</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container hidden" id="viewerContainer">
+        <a class="back-btn" onclick="closeViewer()">← 返回列表</a>
+        <div class="viewer">
+            <div class="viewer-header">
+                <span class="viewer-title" id="viewerTitle">文件内容</span>
+                <button class="close-btn" onclick="closeViewer()">✕ 关闭</button>
+            </div>
+            <div class="viewer-content" id="viewerContent">
+                <div class="loading">加载文件内容...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const OWNER = 'zhanghtgm-blip';
+        const REPO = 'finance';
+        const BASE_PATH = 'report';
+        
+        let cachedDates = null;
+        let cachedFiles = {};
+        let currentDate = '';
+        
+        // 国家/地区图标映射
+        const countryIcons = {
+            'Europe': '🌍',
+            'Belgium': '🇧🇪',
+            'Finland': '🇫🇮',
+            'France': '🇫🇷',
+            'Germany': '🇩🇪',
+            'Ireland': '🇮🇪',
+            'Israel': '🇮🇱',
+            'Italy': '🇮🇹',
+            'Poland': '🇵🇱',
+            'Sweden': '🇸🇪',
+            'Switzerland': '🇨🇭',
+            'index': '📋'
+        };
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', init);
+        
+        async function init() {
+            await loadDates();
+        }
+        
+        // 加载日期目录列表
+        async function loadDates() {
+            const dateList = document.getElementById('dateList');
+            dateList.innerHTML = '<div class="loading">加载日期目录...</div>';
+            
+            if (cachedDates) {
+                renderDates(cachedDates);
+                return;
+            }
+            
+            try {
+                const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${BASE_PATH}`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                cachedDates = data;
+                renderDates(data);
+                updateLastUpdate();
+            } catch (error) {
+                dateList.innerHTML = `<div class="error">加载失败: ${error.message}</div>`;
+            }
+        }
+        
+        // 渲染日期列表
+        function renderDates(dates) {
+            const dateList = document.getElementById('dateList');
+            dateList.innerHTML = '';
+            
+            if (!Array.isArray(dates) || dates.length === 0) {
+                dateList.innerHTML = '<div class="loading">暂无日期目录</div>';
+                return;
+            }
+            
+            // 按日期排序（倒序）
+            const sortedDates = dates.filter(d => d.type === 'dir').sort((a, b) => b.name.localeCompare(a.name));
+            
+            sortedDates.forEach(dateDir => {
+                const btn = document.createElement('button');
+                btn.className = 'date-btn';
+                btn.textContent = dateDir.name;
+                btn.onclick = () => selectDate(dateDir.name);
+                dateList.appendChild(btn);
+            });
+            
+            // 自动选择第一个日期
+            if (sortedDates.length > 0 && !currentDate) {
+                selectDate(sortedDates[0].name);
+            }
+        }
+        
+        // 选择日期
+        async function selectDate(dateName) {
+            currentDate = dateName;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.date-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent === dateName);
+            });
+            
+            // 显示文件区域
+            document.getElementById('fileSection').classList.remove('hidden');
+            document.getElementById('fileSectionTitle').textContent = `�� ${dateName} 目录文件`;
+            
+            await loadFiles(dateName);
+        }
+        
+        // 加载文件列表
+        async function loadFiles(dateName) {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '<div class="loading">加载文件列表...</div>';
+            
+            const cacheKey = `${dateName}`;
+            if (cachedFiles[cacheKey]) {
+                renderFiles(cachedFiles[cacheKey]);
+                return;
+            }
+            
+            try {
+                const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${BASE_PATH}/${dateName}`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                cachedFiles[cacheKey] = data;
+                renderFiles(data);
+            } catch (error) {
+                fileList.innerHTML = `<div class="error">加载失败: ${error.message}</div>`;
+            }
+        }
+        
+        // 渲染文件列表
+        function renderFiles(files) {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+            
+            if (!Array.isArray(files) || files.length === 0) {
+                fileList.innerHTML = '<div class="loading">暂无文件</div>';
+                return;
+            }
+            
+            // 文件排序：index.html 优先，其余按名称排序
+            const sortedFiles = files.filter(f => f.type === 'file' && f.name.endsWith('.html'))
+                .sort((a, b) => {
+                    if (a.name === 'index.html') return -1;
+                    if (b.name === 'index.html') return 1;
+                    return a.name.localeCompare(b.name);
+                });
+            
+            sortedFiles.forEach(file => {
+                const item = document.createElement('a');
+                item.className = 'file-item';
+                
+                const nameWithoutExt = file.name.replace('.html', '');
+                const icon = countryIcons[nameWithoutExt] || '📄';
+                
+                item.innerHTML = `
+                    <span class="icon">${icon}</span>
+                    <span class="name">${file.name}</span>
+                    <span class="size">${(file.size / 1024).toFixed(1)} KB</span>
+                `;
+                item.onclick = (e) => {
+                    e.preventDefault();
+                    openFile(file);
+                };
+                fileList.appendChild(item);
+            });
+        }
+        
+        // 打开文件
+        async function openFile(file) {
+            const viewerContainer = document.getElementById('viewerContainer');
+            const viewerContent = document.getElementById('viewerContent');
+            const viewerTitle = document.getElementById('viewerTitle');
+            
+            viewerContainer.classList.remove('hidden');
+            viewerContent.innerHTML = '<div class="loading">加载文件内容...</div>';
+            viewerTitle.textContent = file.name;
+            
+            // 隐藏主容器
+            document.getElementById('mainContainer').classList.add('hidden');
+            
+            try {
+                const response = await fetch(file.download_url);
+                const htmlContent = await response.text();
+                
+                // 提取body内容
+                const bodyMatch = htmlContent.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+                let content = bodyMatch ? bodyMatch[1] : htmlContent;
+                
+                // 清理内容中的相对路径
+                content = content.replace(/src="/g, 'src="https://raw.githubusercontent.com/zhanghtgm-blip/finance/master/');
+                content = content.replace(/href="/g, 'href="https://github.com/zhanghtgm-blip/finance/blob/master/');
+                
+                viewerContent.innerHTML = content;
+                
+                // 滚动到顶部
+                viewerContainer.scrollIntoView({ behavior: 'smooth' });
+            } catch (error) {
+                viewerContent.innerHTML = `<div class="error">加载失败: ${error.message}</div>`;
+            }
+        }
+        
+        // 关闭查看器
+        function closeViewer() {
+            const viewerContainer = document.getElementById('viewerContainer');
+            viewerContainer.classList.add('hidden');
+            
+            // 显示主容器
+            document.getElementById('mainContainer').classList.remove('hidden');
+        }
+        
+        // 更新最后更新时间
+        function updateLastUpdate() {
+            const now = new Date();
+            const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+            document.getElementById('lastUpdate').textContent = `最后更新: ${timeStr}`;
+        }
+    </script>
+</body>
+</html>
