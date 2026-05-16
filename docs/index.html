@@ -500,10 +500,15 @@
                 
                 const data = await response.json();
                 
-                // 解码 UTF-8 Base64
-                const content = decodeURIComponent(atob(data.content).split('').map(function(c) {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                }).join(''));
+                // 解码 UTF-8 Base64 - 使用更兼容的方法
+                let content;
+                try {
+                    content = new TextDecoder('utf-8').decode(
+                        Uint8Array.from(atob(data.content), c => c.charCodeAt(0))
+                    );
+                } catch (e) {
+                    content = decodeURIComponent(escape(atob(data.content)));
+                }
                 
                 // 提取 body 内容
                 let bodyContent = content;
